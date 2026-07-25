@@ -1,3 +1,9 @@
 datasets
 ipywidgets
 transformers
+accelerate
+rouge-score
+textstat
+torch --index-url https://download.pytorch.org/whl/cu121
+torchvision --index-url https://download.pytorch.org/whl/cu121
+torchaudio --index-url https://download.pytorch.org/whl/cu121
