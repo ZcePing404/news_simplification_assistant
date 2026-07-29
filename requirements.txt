@@ -2,8 +2,12 @@ datasets
 ipywidgets
 transformers
 accelerate
+peft
+bitsandbytes
 rouge-score
 textstat
-torch --index-url https://download.pytorch.org/whl/cu121
-torchvision --index-url https://download.pytorch.org/whl/cu121
-torchaudio --index-url https://download.pytorch.org/whl/cu121
+torch
+torchvision
+torchaudio
+pandas
+nltk
