@@ -1,6 +1,6 @@
 datasets
 ipywidgets
-transformers
+transformers==4.57.6
 accelerate
 peft
 bitsandbytes
