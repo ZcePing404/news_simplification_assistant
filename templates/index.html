@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>News Simplification System</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+
+<body>
+
+<div class="page">
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+
+    <header class="header">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                N
+            </div>
+
+            <div>
+                <h1>
+                    News Simplification System
+                </h1>
+
+                <p>
+                    AI-powered news summarization and
+                    information extraction using fine-tuned
+                    OPT language models.
+                </p>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+
+    <main class="workspace">
+
+
+        <!-- LEFT SIDE -->
+        <section class="panel input-panel">
+
+            <div class="panel-heading">
+
+                <div>
+                    <span class="step-label">
+                        INPUT
+                    </span>
+
+                    <h2>
+                        News Article
+                    </h2>
+                </div>
+
+                <span
+                    id="characterCount"
+                    class="character-count"
+                >
+                    0 characters
+                </span>
+
+            </div>
+
+
+            <!-- MODEL SELECTION -->
+
+            <div class="field">
+
+                <label for="model">
+                    Select AI Model
+                </label>
+
+                <select id="model">
+
+                    {% for key, model in models.items() %}
+
+                    <option value="{{ key }}">
+                        {{ model.display_name }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <p class="field-hint">
+                    Select the fine-tuned OPT model
+                    that will process the article.
+                </p>
+
+            </div>
+
+
+            <!-- ARTICLE -->
+
+            <div class="field article-field">
+
+                <label for="article">
+                    Article Content
+                </label>
+
+                <textarea
+                    id="article"
+                    placeholder="Paste the news article you want to simplify here..."
+                ></textarea>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="actions">
+
+                <button
+                    id="clearButton"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Clear
+                </button>
+
+                <button
+                    id="generateButton"
+                    class="primary-button"
+                    type="button"
+                >
+                    <span id="buttonText">
+                        Generate Analysis
+                    </span>
+
+                    <span
+                        id="buttonLoader"
+                        class="button-loader hidden"
+                    ></span>
+
+                </button>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div
+                id="status"
+                class="status"
+                aria-live="polite"
+            ></div>
+
+        </section>
+
+
+
+        <!-- RIGHT SIDE -->
+        <section class="panel output-panel">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <span class="step-label">
+                        OUTPUT
+                    </span>
+
+                    <h2>
+                        Simplified Result
+                    </h2>
+
+                </div>
+
+                <div
+                    id="modelBadge"
+                    class="model-badge hidden"
+                >
+                </div>
+
+            </div>
+
+
+            <!-- EMPTY STATE -->
+
+            <div
+                id="emptyState"
+                class="empty-state"
+            >
+
+                <div class="empty-icon">
+                    ✦
+                </div>
+
+                <h3>
+                    Ready for analysis
+                </h3>
+
+                <p>
+                    Paste a news article, select a model,
+                    and click Generate Analysis.
+                </p>
+
+            </div>
+
+
+            <!-- RESULT -->
+
+            <div
+                id="resultContainer"
+                class="result-container hidden"
+            >
+
+                <!-- SUMMARY -->
+                <div class="summary-card">
+
+                    <div class="result-heading">
+                        Summary
+                    </div>
+
+                    <div
+                        id="summaryResult"
+                        class="summary-text"
+                    ></div>
+
+                </div>
+
+
+                <!-- ASPECTS -->
+                <div class="aspects-section">
+
+                    <div class="section-title">
+                        Extracted Aspects
+                    </div>
+
+
+                    <div class="aspects-grid">
+
+                        <!-- EVENT -->
+                        <div class="aspect-card">
+
+                            <div class="aspect-label">
+                                Event
+                            </div>
+
+                            <div
+                                id="eventResult"
+                                class="aspect-value"
+                            ></div>
+
+                        </div>
+
+
+                        <!-- PEOPLE -->
+                        <div class="aspect-card">
+
+                            <div class="aspect-label">
+                                People
+                            </div>
+
+                            <div
+                                id="peopleResult"
+                                class="aspect-value"
+                            ></div>
+
+                        </div>
+
+
+                        <!-- ORGANIZATION -->
+                        <div class="aspect-card">
+
+                            <div class="aspect-label">
+                                Organization
+                            </div>
+
+                            <div
+                                id="organizationResult"
+                                class="aspect-value"
+                            ></div>
+
+                        </div>
+
+
+                        <!-- DATE & TIME -->
+                        <div class="aspect-card">
+
+                            <div class="aspect-label">
+                                Date & Time
+                            </div>
+
+                            <div
+                                id="dateTimeResult"
+                                class="aspect-value"
+                            ></div>
+
+                        </div>
+
+
+                        <!-- LOCATION -->
+                        <div class="aspect-card">
+
+                            <div class="aspect-label">
+                                Location
+                            </div>
+
+                            <div
+                                id="locationResult"
+                                class="aspect-value"
+                            ></div>
+
+                        </div>
+
+
+                        <!-- CAUSES -->
+                        <div class="aspect-card">
+
+                            <div class="aspect-label">
+                                Causes
+                            </div>
+
+                            <div
+                                id="causesResult"
+                                class="aspect-value"
+                            ></div>
+
+                        </div>
+
+
+                        <!-- EFFECTS -->
+                        <div class="aspect-card">
+
+                            <div class="aspect-label">
+                                Effects
+                            </div>
+
+                            <div
+                                id="effectsResult"
+                                class="aspect-value"
+                            ></div>
+
+                        </div>
+
+
+                        <!-- COUNTERMEASURES -->
+                        <div class="aspect-card">
+
+                            <div class="aspect-label">
+                                Countermeasures
+                            </div>
+
+                            <div
+                                id="countermeasuresResult"
+                                class="aspect-value"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+</div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer class="footer">
+
+        <span>
+            Fine-tuned OPT News Simplification System
+        </span>
+
+        <span>
+            NLP Model Comparison Prototype
+        </span>
+
+    </footer>
+
+</div>
+
+
+
+<script>
+
+const articleInput =
+    document.getElementById("article");
+
+const modelSelect =
+    document.getElementById("model");
+
+const generateButton =
+    document.getElementById("generateButton");
+
+const clearButton =
+    document.getElementById("clearButton");
+
+const statusElement =
+    document.getElementById("status");
+
+const resultContainer =
+    document.getElementById("resultContainer");
+
+const summaryResult =
+    document.getElementById("summaryResult");
+
+const eventResult =
+    document.getElementById("eventResult");
+
+const peopleResult =
+    document.getElementById("peopleResult");
+
+const organizationResult =
+    document.getElementById("organizationResult");
+
+const dateTimeResult =
+    document.getElementById("dateTimeResult");
+
+const locationResult =
+    document.getElementById("locationResult");
+
+const causesResult =
+    document.getElementById("causesResult");
+
+const effectsResult =
+    document.getElementById("effectsResult");
+
+const countermeasuresResult =
+    document.getElementById("countermeasuresResult");
+
+const emptyState =
+    document.getElementById("emptyState");
+
+const modelBadge =
+    document.getElementById("modelBadge");
+
+const characterCount =
+    document.getElementById("characterCount");
+
+const buttonText =
+    document.getElementById("buttonText");
+
+const buttonLoader =
+    document.getElementById("buttonLoader");
+
+
+
+/* =========================
+   CHARACTER COUNTER
+========================= */
+
+articleInput.addEventListener(
+    "input",
+    function () {
+
+        const length =
+            articleInput.value.length;
+
+        characterCount.textContent =
+            length.toLocaleString()
+            + " characters";
+
+    }
+);
+
+
+
+/* =========================
+   CLEAR
+========================= */
+
+clearButton.addEventListener(
+    "click",
+    function () {
+
+        articleInput.value = "";
+
+        characterCount.textContent =
+            "0 characters";
+
+        statusElement.textContent = "";
+        statusElement.className = "status";
+
+        resultContainer.classList.add(
+            "hidden"
+        );
+
+        modelBadge.classList.add(
+            "hidden"
+        );
+
+        emptyState.classList.remove(
+            "hidden"
+        );
+
+        articleInput.focus();
+
+    }
+);
+
+function parseModelOutput(text) {
+
+    const result = {
+        summary: "Not stated",
+        event: "Not stated",
+        people: "Not stated",
+        organization: "Not stated",
+        dateTime: "Not stated",
+        location: "Not stated",
+        causes: "Not stated",
+        effects: "Not stated",
+        countermeasures: "Not stated"
+    };
+
+
+    // Normalize line endings
+    text = text
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .trim();
+
+
+    /*
+        Summary:
+        ...
+        Aspects:
+    */
+    const summaryMatch = text.match(
+        /Summary:\s*([\s\S]*?)(?=\s*Aspects:)/i
+    );
+
+    if (
+        summaryMatch &&
+        summaryMatch[1].trim()
+    ) {
+        result.summary =
+            summaryMatch[1].trim();
+    }
+
+
+    /*
+        Extract each aspect until the
+        next known label appears.
+    */
+
+    const patterns = {
+
+        event:
+            /Event:\s*([\s\S]*?)(?=\s*People:)/i,
+
+        people:
+            /People:\s*([\s\S]*?)(?=\s*Organization:)/i,
+
+        organization:
+            /Organization:\s*([\s\S]*?)(?=\s*Date\s*&\s*Time:)/i,
+
+        dateTime:
+            /Date\s*&\s*Time:\s*([\s\S]*?)(?=\s*Location:)/i,
+
+        location:
+            /Location:\s*([\s\S]*?)(?=\s*Causes:)/i,
+
+        causes:
+            /Causes:\s*([\s\S]*?)(?=\s*Effects:)/i,
+
+        effects:
+            /Effects:\s*([\s\S]*?)(?=\s*Countermeasures:)/i,
+
+        countermeasures:
+            /Countermeasures:\s*([\s\S]*?)$/i
+    };
+
+
+    for (
+        const [key, pattern]
+        of Object.entries(patterns)
+    ) {
+
+        const match =
+            text.match(pattern);
+
+        if (
+            match &&
+            match[1].trim()
+        ) {
+
+            result[key] =
+                match[1].trim();
+        }
+
+    }
+
+
+    return result;
+}
+
+/* =========================
+   GENERATE
+========================= */
+
+generateButton.addEventListener(
+    "click",
+    async function () {
+
+        const article =
+            articleInput.value.trim();
+
+        const model =
+            modelSelect.value;
+
+
+        if (!article) {
+
+            statusElement.textContent =
+                "Please enter a news article before generating.";
+
+            statusElement.className =
+                "status error";
+
+            articleInput.focus();
+
+            return;
+
+        }
+
+
+        /* Loading state */
+
+        generateButton.disabled = true;
+
+        buttonText.textContent =
+            "Generating...";
+
+        buttonLoader.classList.remove(
+            "hidden"
+        );
+
+        statusElement.textContent =
+            "Loading model and processing article...";
+
+        statusElement.className =
+            "status loading";
+
+        resultContainer.classList.add(
+            "hidden"
+        );
+
+        emptyState.classList.remove(
+            "hidden"
+        );
+
+        modelBadge.classList.add(
+            "hidden"
+        );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/generate",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify(
+                            {
+                                article: article,
+                                model: model
+                            }
+                        )
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok ||
+                !data.success) {
+
+                throw new Error(
+                    data.error ||
+                    "Generation failed."
+                );
+
+            }
+
+
+            /* Display result */
+
+            const parsed =
+                parseModelOutput(
+                    data.result
+                );
+
+
+            summaryResult.textContent =
+                parsed.summary;
+
+            eventResult.textContent =
+                parsed.event;
+
+            peopleResult.textContent =
+                parsed.people;
+
+            organizationResult.textContent =
+                parsed.organization;
+
+            dateTimeResult.textContent =
+                parsed.dateTime;
+
+            locationResult.textContent =
+                parsed.location;
+
+            causesResult.textContent =
+                parsed.causes;
+
+            effectsResult.textContent =
+                parsed.effects;
+
+            countermeasuresResult.textContent =
+                parsed.countermeasures;
+
+            modelBadge.textContent =
+                data.model;
+
+            emptyState.classList.add(
+                "hidden"
+            );
+
+            resultContainer.classList.remove(
+                "hidden"
+            );
+
+            modelBadge.classList.remove(
+                "hidden"
+            );
+
+            statusElement.textContent =
+                "Analysis completed successfully.";
+
+            statusElement.className =
+                "status success";
+
+        }
+
+        catch (error) {
+
+            statusElement.textContent =
+                "Error: " + error.message;
+
+            statusElement.className =
+                "status error";
+
+        }
+
+        finally {
+
+            generateButton.disabled =
+                false;
+
+            buttonText.textContent =
+                "Generate Analysis";
+
+            buttonLoader.classList.add(
+                "hidden"
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
