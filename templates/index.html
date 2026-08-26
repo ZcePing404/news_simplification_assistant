@@ -95,6 +95,7 @@
 
                 <select id="model">
 
+                    {% if models %}
                     {% for key, model in models.items() %}
 
                     <option value="{{ key }}">
@@ -102,6 +103,11 @@
                     </option>
 
                     {% endfor %}
+                    {% else %}
+                    <option value="" selected disabled>
+                        No installed model found
+                    </option>
+                    {% endif %}
 
                 </select>
 
@@ -719,10 +725,29 @@ generateButton.addEventListener(
 
             /* Display result */
 
-            const parsed =
-                parseModelOutput(
-                    data.result
-                );
+            const aspects =
+                data.aspects || {};
+
+            const parsed = {
+                summary:
+                    data.summary || "Not stated",
+                event:
+                    aspects.event || "Not stated",
+                people:
+                    aspects.people || "Not stated",
+                organization:
+                    aspects.organization || "Not stated",
+                dateTime:
+                    aspects.date_time || "Not stated",
+                location:
+                    aspects.location || "Not stated",
+                causes:
+                    aspects.causes || "Not stated",
+                effects:
+                    aspects.effects || "Not stated",
+                countermeasures:
+                    aspects.countermeasures || "Not stated"
+            };
 
 
             summaryResult.textContent =
@@ -767,11 +792,23 @@ generateButton.addEventListener(
                 "hidden"
             );
 
-            statusElement.textContent =
-                "Analysis completed successfully.";
+            if (data.warning) {
 
-            statusElement.className =
-                "status success";
+                statusElement.textContent =
+                    "Warning: " + data.warning;
+
+                statusElement.className =
+                    "status warning";
+
+            } else {
+
+                statusElement.textContent =
+                    "Analysis completed successfully.";
+
+                statusElement.className =
+                    "status success";
+
+            }
 
         }
 

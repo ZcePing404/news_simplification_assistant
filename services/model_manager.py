@@ -3,7 +3,7 @@ import threading
 from pathlib import Path
 
 import torch
-from peft import PeftModel
+from peft import PeftConfig, PeftModel
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
@@ -52,7 +52,7 @@ class ModelManager:
                 "adapter_path": (
                     self.project_root
                     / "models"
-                    / "opt-2.7b-news-simplifier"
+                    / "opt-2.7b-news-model"
                 )
             }
         }
@@ -73,13 +73,19 @@ class ModelManager:
         return {
             key: {
                 "display_name": config["display_name"],
-                "installed": config["adapter_path"].exists()
+                "installed": True
             }
             for key, config in self.model_configs.items()
+            if self._adapter_is_installed(config["adapter_path"])
         }
 
     def is_valid_model(self, model_key: str) -> bool:
-        return model_key in self.model_configs
+        return (
+            model_key in self.model_configs
+            and self._adapter_is_installed(
+                self.model_configs[model_key]["adapter_path"]
+            )
+        )
 
     def get_display_name(self, model_key: str) -> str:
         self._require_valid_model_key(model_key)
@@ -93,6 +99,18 @@ class ModelManager:
         model_key: str,
         article: str
     ) -> str:
+        return self.generate_attempt(
+            model_key=model_key,
+            article=article,
+            corrective=False
+        )["raw_output"]
+
+    def generate_attempt(
+        self,
+        model_key: str,
+        article: str,
+        corrective: bool = False
+    ) -> dict:
         """
         Generate with the selected fine-tuned OPT model.
 
@@ -105,14 +123,18 @@ class ModelManager:
                 model_key
             )
 
-            prompt = (
+            prompt_details = (
                 self.prompt_service
                 .fit_prompt_to_context(
                     tokenizer=tokenizer,
                     article=article,
-                    reserved_tokens=self.MAX_NEW_TOKENS
+                    reserved_tokens=self.MAX_NEW_TOKENS,
+                    corrective=corrective,
+                    return_details=True
                 )
             )
+
+            prompt = prompt_details["prompt"]
 
             inputs = tokenizer(
                 prompt,
@@ -152,7 +174,23 @@ class ModelManager:
                 skip_special_tokens=True
             )
 
-            return result.strip()
+            return {
+                "raw_output": result.strip(),
+                "input_token_length": prompt_details[
+                    "input_token_length"
+                ],
+                "generated_token_count": int(
+                    generated_ids.shape[0]
+                ),
+                "article_was_truncated": prompt_details[
+                    "article_was_truncated"
+                ],
+                "source_keywords": (
+                    self.prompt_service
+                    .extract_source_keywords(article)
+                ),
+                "corrective": corrective
+            }
 
     def load_model(self, model_key: str):
         self._require_valid_model_key(
@@ -179,15 +217,30 @@ class ModelManager:
             "adapter_path"
         ]
 
-        if not adapter_path.exists():
+        if not self._adapter_is_installed(adapter_path):
             raise FileNotFoundError(
-                f"{config['display_name']} adapter was not found at: "
-                f"{adapter_path}"
+                f"{config['display_name']} adapter files were not found at: "
+                f"{adapter_path}. Expected adapter_config.json and "
+                "adapter_model.safetensors."
             )
 
-        base_model_name = config[
-            "base_model"
-        ]
+        adapter_config = PeftConfig.from_pretrained(
+            str(adapter_path)
+        )
+        base_model_name = adapter_config.base_model_name_or_path
+
+        if not base_model_name:
+            raise ValueError(
+                f"{config['display_name']} adapter does not identify its "
+                "base model."
+            )
+
+        if base_model_name != config["base_model"]:
+            raise ValueError(
+                f"{config['display_name']} adapter expects base model "
+                f"'{base_model_name}', but the application is configured "
+                f"for '{config['base_model']}'."
+            )
 
         print(
             f"Loading {config['display_name']} "
@@ -324,3 +377,11 @@ class ModelManager:
             raise ValueError(
                 f"Unknown model key: {model_key}"
             )
+
+    @staticmethod
+    def _adapter_is_installed(adapter_path: Path) -> bool:
+        return (
+            adapter_path.is_dir()
+            and (adapter_path / "adapter_config.json").is_file()
+            and (adapter_path / "adapter_model.safetensors").is_file()
+        )

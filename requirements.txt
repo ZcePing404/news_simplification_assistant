@@ -11,3 +11,5 @@ torchvision
 torchaudio
 pandas
 nltk
+flask
+scikit-learn

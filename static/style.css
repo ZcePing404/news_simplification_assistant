@@ -24,6 +24,9 @@
     --success: #137a50;
     --success-bg: #ecfdf3;
 
+    --warning: #8a4b08;
+    --warning-bg: #fff7e6;
+
     --error: #b42318;
     --error-bg: #fff1f0;
 
@@ -463,6 +466,21 @@ button:disabled {
 
 .status.success {
     color: var(--success);
+}
+
+
+.status.warning {
+    padding:
+        10px
+        12px;
+
+    border-radius: 8px;
+
+    background:
+        var(--warning-bg);
+
+    color:
+        var(--warning);
 }
 
 
