@@ -9,6 +9,10 @@ from fastapi import HTTPException, Request, status
 APP_NAME = "news-simplification-inference"
 ADAPTER_REPO = "hehehehe6625/news-simplication"
 MODEL_FAMILIES = {
+    "opt125m": {
+        "base_model": "facebook/opt-125m",
+        "adapter_subfolder": "opt-125m"
+    },
     "opt13b": {
         "base_model": "facebook/opt-1.3b",
         "adapter_subfolder": "opt-1.3b"
@@ -19,6 +23,16 @@ MODEL_FAMILIES = {
     }
 }
 MODEL_ROUTES = {
+    "opt125m_base": {
+        "family": "opt125m",
+        "use_adapter": False,
+        "display_name": "Original OPT-125M"
+    },
+    "opt125m_news": {
+        "family": "opt125m",
+        "use_adapter": True,
+        "display_name": "Fine-tuned OPT-125M"
+    },
     "opt13b_base": {
         "family": "opt13b",
         "use_adapter": False,

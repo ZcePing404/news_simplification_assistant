@@ -9,6 +9,8 @@ class RemoteInferenceError(RuntimeError):
 
 class RemoteModelClient:
     MODEL_NAMES = {
+        "opt125m_base": "Original OPT-125M",
+        "opt125m_news": "Fine-tuned OPT-125M",
         "opt13b_base": "Original OPT-1.3B",
         "opt13b_news": "Fine-tuned OPT-1.3B",
         "opt27b_base": "Original OPT-2.7B",
