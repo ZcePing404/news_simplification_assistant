@@ -382,6 +382,21 @@
 
                 </div>
 
+
+                <!-- RAW MODEL OUTPUT -->
+                <div class="raw-output-section">
+
+                    <div class="section-title">
+                        Raw Model Output
+                    </div>
+
+                    <pre
+                        id="rawOutputResult"
+                        class="raw-output-text"
+                    ></pre>
+
+                </div>
+
             </div>
 </div>
 
@@ -457,6 +472,9 @@ const effectsResult =
 const countermeasuresResult =
     document.getElementById("countermeasuresResult");
 
+const rawOutputResult =
+    document.getElementById("rawOutputResult");
+
 const emptyState =
     document.getElementById("emptyState");
 
@@ -517,6 +535,8 @@ clearButton.addEventListener(
         modelBadge.classList.add(
             "hidden"
         );
+
+        rawOutputResult.textContent = "";
 
         emptyState.classList.remove(
             "hidden"
@@ -776,6 +796,11 @@ generateButton.addEventListener(
 
             countermeasuresResult.textContent =
                 parsed.countermeasures;
+
+            rawOutputResult.textContent =
+                data.generated_text ||
+                data.result ||
+                "No raw model output was returned.";
 
             modelBadge.textContent =
                 data.model;

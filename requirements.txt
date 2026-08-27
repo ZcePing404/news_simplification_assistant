@@ -13,3 +13,9 @@ pandas
 nltk
 flask
 scikit-learn
+requests
+modal
+fastapi
+python-dotenv
+huggingface_hub
+modal

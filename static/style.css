@@ -756,6 +756,42 @@ button:disabled {
 }
 
 
+/* =========================================================
+   RAW MODEL OUTPUT
+========================================================= */
+
+.raw-output-section {
+    margin-top: 2px;
+}
+
+
+.raw-output-text {
+    max-height: 360px;
+    margin: 0;
+    padding: 18px;
+
+    overflow: auto;
+
+    color: #344054;
+    background: #f8fafc;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Consolas,
+        "Liberation Mono",
+        monospace;
+    font-size: 13px;
+    line-height: 1.65;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+
 
 /* =========================================================
    RESPONSIVE RESULT
