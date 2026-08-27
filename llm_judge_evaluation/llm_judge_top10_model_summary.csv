@@ -1,0 +1,3 @@
+model,evaluated_outputs,parse_success_rate,mean_judge_time_sec,mean_clarity,mean_usefulness,mean_factual_consistency,mean_grammar,mean_faithfulness,mean_overall
+OPT-1.3B,9,0.9,35.3926569704444,5.0,4.444444444444445,5.0,5.0,4.555555555555555,4.8
+OPT-2.7B,6,0.6,35.64807948233329,5.0,4.333333333333333,5.0,5.0,4.666666666666667,4.8
