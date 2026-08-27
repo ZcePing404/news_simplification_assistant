@@ -39,6 +39,8 @@ Supported model IDs:
 
 | Model ID | Display name | Base model | Adapter |
 |---|---|---|---|
+| `opt125m_news` | Original OPT-125M | `facebook/opt-125m` | Disabled |
+| `opt125m_news` | Fine-tuned OPT-125M | `facebook/opt-125m` | `opt-125m` |
 | `opt13b_base` | Original OPT-1.3B | `facebook/opt-1.3b` | Disabled |
 | `opt13b_news` | Fine-tuned OPT-1.3B | `facebook/opt-1.3b` | `opt-1.3b` |
 | `opt27b_base` | Original OPT-2.7B | `facebook/opt-2.7b` | Disabled |
@@ -56,14 +58,7 @@ pip install -r requirements.txt
 
 ### 2. Create the local environment file
 
-Copy the example configuration:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Configure `.env`:
-
+Create `.env` file and configure:
 ```env
 NEWS_INFERENCE_API_URL=https://weihe6625--news-simplification-inference-newsinference-generate.modal.run
 NEWS_INFERENCE_API_TOKEN=5STKnig1lCwAUag3R34RlnD6uroqRHeO
@@ -74,7 +69,7 @@ The actual API token must not be committed to GitHub.
 ### 3. Start the Flask application
 
 ```powershell
-.\.venv\Scripts\python.exe app.py
+flask run
 ```
 
 Open the application at:
