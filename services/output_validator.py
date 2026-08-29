@@ -8,8 +8,7 @@ class OutputValidator:
         "Summary",
         "Aspects",
         "Event",
-        "People",
-        "Organization",
+        "People/Organizations",
         "Date & Time",
         "Location",
         "Causes",
@@ -126,9 +125,29 @@ class OutputValidator:
         }
 
     def _has_complete_structure(self, raw_output: str) -> bool:
+        if self._labels_are_complete(raw_output, self.ORDERED_LABELS):
+            return True
+
+        legacy_labels = (
+            "Summary",
+            "Aspects",
+            "Event",
+            "People",
+            "Organization",
+            "Date & Time",
+            "Location",
+            "Causes",
+            "Effects",
+            "Countermeasures"
+        )
+
+        return self._labels_are_complete(raw_output, legacy_labels)
+
+    @staticmethod
+    def _labels_are_complete(raw_output: str, labels: tuple) -> bool:
         positions = []
 
-        for label in self.ORDERED_LABELS:
+        for label in labels:
             matches = list(re.finditer(
                 rf"(?im)^\s*{re.escape(label)}\s*:",
                 raw_output

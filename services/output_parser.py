@@ -11,8 +11,7 @@ class OutputParser:
 
     ASPECT_KEYS = (
         "event",
-        "people",
-        "organization",
+        "people_organizations",
         "date_time",
         "location",
         "causes",
@@ -29,7 +28,13 @@ class OutputParser:
 
         "event": re.compile(
             r"Event:\s*(.*?)"
-            r"(?=\s*People:|$)",
+            r"(?=\s*People\s*/\s*Organizations:|\s*People:|$)",
+            flags=re.IGNORECASE | re.DOTALL
+        ),
+
+        "people_organizations": re.compile(
+            r"People\s*/\s*Organizations:\s*(.*?)"
+            r"(?=\s*Date\s*&\s*Time:|$)",
             flags=re.IGNORECASE | re.DOTALL
         ),
 
@@ -91,10 +96,25 @@ class OutputParser:
             for key in self.ASPECT_KEYS
         }
 
+        if aspects["people_organizations"] == self.DEFAULT_VALUE:
+            aspects["people_organizations"] = self._extract_legacy_entities(text)
+
         return {
             "summary": summary,
             "aspects": aspects
         }
+
+    def _extract_legacy_entities(self, text: str) -> str:
+        """Combine output from checkpoints trained with the old two-label schema."""
+        values = []
+
+        for key in ("people", "organization"):
+            value = self._extract(text, key)
+
+            if value.lower() != self.DEFAULT_VALUE.lower() and value not in values:
+                values.append(value)
+
+        return "; ".join(values) if values else self.DEFAULT_VALUE
 
     def _extract(self, text: str, key: str) -> str:
         pattern = self.PATTERNS[key]

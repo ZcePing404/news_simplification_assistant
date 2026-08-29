@@ -274,30 +274,15 @@
                         </div>
 
 
-                        <!-- PEOPLE -->
+                        <!-- PEOPLE / ORGANIZATIONS -->
                         <div class="aspect-card">
 
                             <div class="aspect-label">
-                                People
+                                People/Organizations
                             </div>
 
                             <div
-                                id="peopleResult"
-                                class="aspect-value"
-                            ></div>
-
-                        </div>
-
-
-                        <!-- ORGANIZATION -->
-                        <div class="aspect-card">
-
-                            <div class="aspect-label">
-                                Organization
-                            </div>
-
-                            <div
-                                id="organizationResult"
+                                id="peopleOrganizationsResult"
                                 class="aspect-value"
                             ></div>
 
@@ -451,11 +436,8 @@ const summaryResult =
 const eventResult =
     document.getElementById("eventResult");
 
-const peopleResult =
-    document.getElementById("peopleResult");
-
-const organizationResult =
-    document.getElementById("organizationResult");
+const peopleOrganizationsResult =
+    document.getElementById("peopleOrganizationsResult");
 
 const dateTimeResult =
     document.getElementById("dateTimeResult");
@@ -552,8 +534,7 @@ function parseModelOutput(text) {
     const result = {
         summary: "Not stated",
         event: "Not stated",
-        people: "Not stated",
-        organization: "Not stated",
+        peopleOrganizations: "Not stated",
         dateTime: "Not stated",
         location: "Not stated",
         causes: "Not stated",
@@ -595,13 +576,10 @@ function parseModelOutput(text) {
     const patterns = {
 
         event:
-            /Event:\s*([\s\S]*?)(?=\s*People:)/i,
+            /Event:\s*([\s\S]*?)(?=\s*People\s*\/\s*Organizations:|\s*People:)/i,
 
-        people:
-            /People:\s*([\s\S]*?)(?=\s*Organization:)/i,
-
-        organization:
-            /Organization:\s*([\s\S]*?)(?=\s*Date\s*&\s*Time:)/i,
+        peopleOrganizations:
+            /People\s*\/\s*Organizations:\s*([\s\S]*?)(?=\s*Date\s*&\s*Time:)/i,
 
         dateTime:
             /Date\s*&\s*Time:\s*([\s\S]*?)(?=\s*Location:)/i,
@@ -635,6 +613,31 @@ function parseModelOutput(text) {
 
             result[key] =
                 match[1].trim();
+        }
+
+    }
+
+    // Transitional support for checkpoints trained with separate
+    // People and Organization labels.
+    if (result.peopleOrganizations === "Not stated") {
+
+        const legacyPeople = text.match(
+            /People:\s*([\s\S]*?)(?=\s*Organization:)/i
+        );
+
+        const legacyOrganization = text.match(
+            /Organization:\s*([\s\S]*?)(?=\s*Date\s*&\s*Time:)/i
+        );
+
+        const legacyValues = [
+            legacyPeople?.[1],
+            legacyOrganization?.[1]
+        ]
+            .map(value => (value || "").trim())
+            .filter(value => value && value.toLowerCase() !== "not stated");
+
+        if (legacyValues.length) {
+            result.peopleOrganizations = [...new Set(legacyValues)].join("; ");
         }
 
     }
@@ -753,10 +756,8 @@ generateButton.addEventListener(
                     data.summary || "Not stated",
                 event:
                     aspects.event || "Not stated",
-                people:
-                    aspects.people || "Not stated",
-                organization:
-                    aspects.organization || "Not stated",
+                peopleOrganizations:
+                    aspects.people_organizations || "Not stated",
                 dateTime:
                     aspects.date_time || "Not stated",
                 location:
@@ -776,11 +777,8 @@ generateButton.addEventListener(
             eventResult.textContent =
                 parsed.event;
 
-            peopleResult.textContent =
-                parsed.people;
-
-            organizationResult.textContent =
-                parsed.organization;
+            peopleOrganizationsResult.textContent =
+                parsed.peopleOrganizations;
 
             dateTimeResult.textContent =
                 parsed.dateTime;

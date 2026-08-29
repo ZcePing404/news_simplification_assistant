@@ -98,8 +98,7 @@ Modal returns a response containing:
   "summary": "Generated simplified summary",
   "aspects": {
     "event": "Extracted event",
-    "people": "Extracted people",
-    "organization": "Extracted organization",
+    "people_organizations": "Extracted people and organizations",
     "date_time": "Extracted date and time",
     "location": "Extracted location",
     "causes": "Extracted causes",
