@@ -203,7 +203,8 @@ class NewsInference:
         )
 
         from services.output_parser import OutputParser
-        from services.output_validator import OutputValidator
+        # Quality checks are disabled; retain the import for easy restoration.
+        # from services.output_validator import OutputValidator
         from services.preprocessor import NewsPreprocessor
         from services.prompt_service import PromptService
 
@@ -259,7 +260,10 @@ class NewsInference:
         self.preprocessor = NewsPreprocessor()
         self.prompt_service = PromptService()
         self.output_parser = OutputParser()
-        self.output_validator = OutputValidator()
+        # Quality validation and corrective prompt retries are intentionally
+        # disabled. Keep this line for easy restoration if retry-based
+        # generation is needed again.
+        # self.output_validator = OutputValidator()
 
         model_cache.commit()
 
@@ -363,86 +367,109 @@ class NewsInference:
                 "end may be truncated to fit the model context."
             )
 
-        attempts = []
+        # Disabled quality-check and corrective-retry workflow. It could send
+        # the article through the model twice with a re-entered corrective
+        # prompt and select one response by validation score.
+        #
+        # attempts = []
+        #
+        # for corrective in (False, True):
+        #     generation = self._generate_attempt(
+        #         article=article,
+        #         model_key=model_key,
+        #         corrective=corrective
+        #     )
+        #     parsed = self.output_parser.parse(generation["raw_output"])
+        #     quality = self.output_validator.evaluate(
+        #         raw_output=generation["raw_output"],
+        #         article=article,
+        #         summary=parsed["summary"]
+        #     )
+        #     attempts.append({
+        #         "generation": generation,
+        #         "parsed": parsed,
+        #         "quality": quality
+        #     })
+        #
+        #     print(
+        #         "Output validation:",
+        #         f"model={model_key}",
+        #         f"attempt={len(attempts)}",
+        #         f"corrective={corrective}",
+        #         f"issue_detected={quality['validation_issue_detected']}",
+        #         f"passed={quality['is_valid']}",
+        #         "copied_source_sentence_detected="
+        #         f"{quality['copied_source_sentence_detected']}",
+        #         f"copied_sentence_count={quality['copied_sentence_count']}",
+        #         f"issues={quality['issues'] or ['none']}"
+        #     )
+        #
+        #     if quality["is_valid"]:
+        #         break
+        #
+        # selected = max(
+        #     attempts,
+        #     key=lambda attempt: (
+        #         attempt["quality"]["is_valid"],
+        #         attempt["quality"]["quality_score"]
+        #     )
+        # )
+        # retry_used = len(attempts) > 1
+        # selected_quality = selected["quality"]
+        #
+        # if retry_used and selected_quality["is_valid"]:
+        #     warnings.append(
+        #         "The first response failed the quality checks, so a "
+        #         "corrective retry was used."
+        #     )
+        #
+        # if not selected_quality["is_valid"]:
+        #     warnings.append(
+        #         "The model could not produce a fully reliable simplified "
+        #         "response after the quality checks. Review the output "
+        #         "carefully because "
+        #         + "; ".join(selected_quality["issues"])
+        #         + "."
+        #     )
+        #
+        # diagnostic_attempts = [
+        #     {
+        #         **attempt["quality"],
+        #         "corrective": attempt["generation"]["corrective"],
+        #         "input_token_length": attempt["generation"][
+        #             "input_token_length"
+        #         ],
+        #         "generated_token_count": attempt["generation"][
+        #             "generated_token_count"
+        #         ],
+        #         "article_was_truncated": attempt["generation"][
+        #             "article_was_truncated"
+        #         ],
+        #         "source_keywords": attempt["generation"][
+        #             "source_keywords"
+        #         ]
+        #     }
+        #     for attempt in attempts
+        # ]
 
-        for corrective in (False, True):
-            generation = self._generate_attempt(
-                article=article,
-                model_key=model_key,
-                corrective=corrective
-            )
-            parsed = self.output_parser.parse(generation["raw_output"])
-            quality = self.output_validator.evaluate(
-                raw_output=generation["raw_output"],
-                article=article,
-                summary=parsed["summary"]
-            )
-            attempts.append({
-                "generation": generation,
-                "parsed": parsed,
-                "quality": quality
-            })
-
-            print(
-                "Output validation:",
-                f"model={model_key}",
-                f"attempt={len(attempts)}",
-                f"corrective={corrective}",
-                f"issue_detected={quality['validation_issue_detected']}",
-                f"passed={quality['is_valid']}",
-                "copied_source_sentence_detected="
-                f"{quality['copied_source_sentence_detected']}",
-                f"copied_sentence_count={quality['copied_sentence_count']}",
-                f"issues={quality['issues'] or ['none']}"
-            )
-
-            if quality["is_valid"]:
-                break
-
-        selected = max(
-            attempts,
-            key=lambda attempt: (
-                attempt["quality"]["is_valid"],
-                attempt["quality"]["quality_score"]
-            )
+        generation = self._generate_attempt(
+            article=article,
+            model_key=model_key,
+            corrective=False
         )
-        retry_used = len(attempts) > 1
-        selected_quality = selected["quality"]
-
-        if retry_used and selected_quality["is_valid"]:
-            warnings.append(
-                "The first response failed the quality checks, so a "
-                "corrective retry was used."
-            )
-
-        if not selected_quality["is_valid"]:
-            warnings.append(
-                "The model could not produce a fully reliable simplified "
-                "response after the quality checks. Review the output "
-                "carefully because "
-                + "; ".join(selected_quality["issues"])
-                + "."
-            )
-
-        diagnostic_attempts = [
-            {
-                **attempt["quality"],
-                "corrective": attempt["generation"]["corrective"],
-                "input_token_length": attempt["generation"][
-                    "input_token_length"
-                ],
-                "generated_token_count": attempt["generation"][
-                    "generated_token_count"
-                ],
-                "article_was_truncated": attempt["generation"][
-                    "article_was_truncated"
-                ],
-                "source_keywords": attempt["generation"][
-                    "source_keywords"
-                ]
-            }
-            for attempt in attempts
-        ]
+        parsed = self.output_parser.parse(generation["raw_output"])
+        selected = {
+            "generation": generation,
+            "parsed": parsed
+        }
+        retry_used = False
+        diagnostic_attempts = [{
+            "corrective": False,
+            "input_token_length": generation["input_token_length"],
+            "generated_token_count": generation["generated_token_count"],
+            "article_was_truncated": generation["article_was_truncated"],
+            "source_keywords": generation["source_keywords"]
+        }]
 
         return {
             "success": True,
@@ -454,7 +481,7 @@ class NewsInference:
             "warning": " ".join(warnings) if warnings else None,
             "retry_used": retry_used,
             "generation_diagnostics": {
-                "selected_attempt": attempts.index(selected) + 1,
+                "selected_attempt": 1,
                 "attempts": diagnostic_attempts
             }
         }

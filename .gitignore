@@ -1,5 +1,46 @@
-# Large-size model configuration files
-models/
+# Local model storage. Keep downloaded base weights, checkpoints, optimizer
+# state, and other training artifacts out of Git.
+models/*
+
+# Allow only the final LoRA adapter and tokenizer files required by the local
+# Flask application. Adapter weights are stored through Git LFS.
+!models/opt-125m-news-simplifier/
+!models/opt-1.3b-news-model/
+!models/opt-2.7b-news-model/
+
+models/opt-125m-news-simplifier/*
+models/opt-1.3b-news-model/*
+models/opt-2.7b-news-model/*
+
+!models/opt-125m-news-simplifier/adapter_config.json
+!models/opt-125m-news-simplifier/adapter_model.safetensors
+!models/opt-125m-news-simplifier/tokenizer_config.json
+!models/opt-125m-news-simplifier/special_tokens_map.json
+!models/opt-125m-news-simplifier/tokenizer.json
+!models/opt-125m-news-simplifier/added_tokens.json
+!models/opt-125m-news-simplifier/vocab.json
+!models/opt-125m-news-simplifier/merges.txt
+!models/opt-125m-news-simplifier/generation_config.json
+
+!models/opt-1.3b-news-model/adapter_config.json
+!models/opt-1.3b-news-model/adapter_model.safetensors
+!models/opt-1.3b-news-model/tokenizer_config.json
+!models/opt-1.3b-news-model/special_tokens_map.json
+!models/opt-1.3b-news-model/tokenizer.json
+!models/opt-1.3b-news-model/added_tokens.json
+!models/opt-1.3b-news-model/vocab.json
+!models/opt-1.3b-news-model/merges.txt
+!models/opt-1.3b-news-model/generation_config.json
+
+!models/opt-2.7b-news-model/adapter_config.json
+!models/opt-2.7b-news-model/adapter_model.safetensors
+!models/opt-2.7b-news-model/tokenizer_config.json
+!models/opt-2.7b-news-model/special_tokens_map.json
+!models/opt-2.7b-news-model/tokenizer.json
+!models/opt-2.7b-news-model/added_tokens.json
+!models/opt-2.7b-news-model/vocab.json
+!models/opt-2.7b-news-model/merges.txt
+!models/opt-2.7b-news-model/generation_config.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

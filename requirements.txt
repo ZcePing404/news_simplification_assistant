@@ -17,5 +17,5 @@ requests
 modal
 fastapi
 python-dotenv
-huggingface_hub
+huggingface_hub>=0.34.0,<1.0
 modal

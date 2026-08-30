@@ -25,9 +25,8 @@ class ModelManager:
         self.project_root = Path(__file__).resolve().parents[1]
         self.prompt_service = prompt_service
 
-        self.model_configs = {
+        model_families = {
             "opt125m": {
-                "display_name": "OPT-125M",
                 "base_model": "facebook/opt-125m",
                 "adapter_path": (
                     self.project_root
@@ -37,17 +36,15 @@ class ModelManager:
             },
 
             "opt13b": {
-                "display_name": "OPT-1.3B",
                 "base_model": "facebook/opt-1.3b",
                 "adapter_path": (
                     self.project_root
                     / "models"
-                    / "opt-1.3b-news-simplifier"
+                    / "opt-1.3b-news-model"
                 )
             },
 
             "opt27b": {
-                "display_name": "OPT-2.7B",
                 "base_model": "facebook/opt-2.7b",
                 "adapter_path": (
                     self.project_root
@@ -57,7 +54,30 @@ class ModelManager:
             }
         }
 
+        self.model_configs = {}
+
+        for family, config in model_families.items():
+            size = {
+                "opt125m": "125M",
+                "opt13b": "1.3B",
+                "opt27b": "2.7B"
+            }[family]
+
+            self.model_configs[f"{family}_base"] = {
+                **config,
+                "family": family,
+                "display_name": f"Original OPT-{size}",
+                "use_adapter": False
+            }
+            self.model_configs[f"{family}_news"] = {
+                **config,
+                "family": family,
+                "display_name": f"Fine-tuned OPT-{size}",
+                "use_adapter": True
+            }
+
         self.current_model_key = None
+        self.current_model_family = None
         self.current_model = None
         self.current_tokenizer = None
 
@@ -76,15 +96,13 @@ class ModelManager:
                 "installed": True
             }
             for key, config in self.model_configs.items()
-            if self._adapter_is_installed(config["adapter_path"])
+            if self._model_is_available(config)
         }
 
     def is_valid_model(self, model_key: str) -> bool:
         return (
             model_key in self.model_configs
-            and self._adapter_is_installed(
-                self.model_configs[model_key]["adapter_path"]
-            )
+            and self._model_is_available(self.model_configs[model_key])
         )
 
     def get_display_name(self, model_key: str) -> str:
@@ -156,14 +174,25 @@ class ModelManager:
                 inputs["input_ids"].shape[1]
             )
 
-            with torch.inference_mode():
-                output_ids = model.generate(
-                    **inputs,
-                    max_new_tokens=self.MAX_NEW_TOKENS,
-                    do_sample=False,
-                    pad_token_id=tokenizer.pad_token_id,
-                    eos_token_id=tokenizer.eos_token_id
-                )
+            def run_generation():
+                with torch.inference_mode():
+                    return model.generate(
+                        **inputs,
+                        max_new_tokens=self.MAX_NEW_TOKENS,
+                        do_sample=False,
+                        pad_token_id=tokenizer.pad_token_id,
+                        eos_token_id=tokenizer.eos_token_id
+                    )
+
+            config = self.model_configs[model_key]
+
+            if config["use_adapter"]:
+                output_ids = run_generation()
+            elif isinstance(model, PeftModel):
+                with model.disable_adapter():
+                    output_ids = run_generation()
+            else:
+                output_ids = run_generation()
 
             generated_ids = output_ids[0][
                 input_length:
@@ -198,10 +227,12 @@ class ModelManager:
         )
 
         if (
-            self.current_model_key == model_key
+            self.current_model_family
+            == self.model_configs[model_key]["family"]
             and self.current_model is not None
             and self.current_tokenizer is not None
         ):
+            self.current_model_key = model_key
             return (
                 self.current_model,
                 self.current_tokenizer
@@ -217,34 +248,37 @@ class ModelManager:
             "adapter_path"
         ]
 
-        if not self._adapter_is_installed(adapter_path):
+        if not self._model_is_available(config):
             raise FileNotFoundError(
                 f"{config['display_name']} adapter files were not found at: "
                 f"{adapter_path}. Expected adapter_config.json and "
                 "adapter_model.safetensors."
             )
 
-        adapter_config = PeftConfig.from_pretrained(
-            str(adapter_path)
-        )
-        base_model_name = adapter_config.base_model_name_or_path
+        adapter_installed = self._adapter_is_installed(adapter_path)
+        base_model_name = config["base_model"]
 
-        if not base_model_name:
-            raise ValueError(
-                f"{config['display_name']} adapter does not identify its "
-                "base model."
+        if adapter_installed:
+            adapter_config = PeftConfig.from_pretrained(
+                str(adapter_path)
             )
+            adapter_base_model = adapter_config.base_model_name_or_path
 
-        if base_model_name != config["base_model"]:
-            raise ValueError(
-                f"{config['display_name']} adapter expects base model "
-                f"'{base_model_name}', but the application is configured "
-                f"for '{config['base_model']}'."
-            )
+            if not adapter_base_model:
+                raise ValueError(
+                    f"{config['display_name']} adapter does not identify "
+                    "its base model."
+                )
+
+            if adapter_base_model != base_model_name:
+                raise ValueError(
+                    f"{config['display_name']} adapter expects base model "
+                    f"'{adapter_base_model}', but the application is "
+                    f"configured for '{base_model_name}'."
+                )
 
         print(
-            f"Loading {config['display_name']} "
-            f"from {adapter_path}"
+            f"Loading local {base_model_name} on the GPU"
         )
 
         tokenizer = self._load_tokenizer(
@@ -256,14 +290,18 @@ class ModelManager:
             base_model_name
         )
 
-        model = PeftModel.from_pretrained(
-            base_model,
-            str(adapter_path)
-        )
+        if adapter_installed:
+            model = PeftModel.from_pretrained(
+                base_model,
+                str(adapter_path)
+            )
+        else:
+            model = base_model
 
         model.eval()
 
         self.current_model_key = model_key
+        self.current_model_family = config["family"]
         self.current_model = model
         self.current_tokenizer = tokenizer
 
@@ -283,6 +321,7 @@ class ModelManager:
         self.current_model = None
         self.current_tokenizer = None
         self.current_model_key = None
+        self.current_model_family = None
 
         gc.collect()
 
@@ -384,4 +423,10 @@ class ModelManager:
             adapter_path.is_dir()
             and (adapter_path / "adapter_config.json").is_file()
             and (adapter_path / "adapter_model.safetensors").is_file()
+        )
+
+    def _model_is_available(self, config: dict) -> bool:
+        return (
+            not config["use_adapter"]
+            or self._adapter_is_installed(config["adapter_path"])
         )
