@@ -39,8 +39,8 @@ Supported model IDs:
 
 | Model ID | Display name | Base model | Adapter |
 |---|---|---|---|
-| `opt125m_news` | Original OPT-125M | `facebook/opt-125m` | Disabled |
-| `opt125m_news` | Fine-tuned OPT-125M | `facebook/opt-125m` | `opt-125m` |
+| `opt125m_base` | Original OPT-125M | `facebook/opt-125m` | Disabled |
+| `opt125m_news` | Fine-tuned OPT-125M | `facebook/opt-125m` | `models/opt-125m-news-model` |
 | `opt13b_base` | Original OPT-1.3B | `facebook/opt-1.3b` | Disabled |
 | `opt13b_news` | Fine-tuned OPT-1.3B | `facebook/opt-1.3b` | `opt-1.3b` |
 | `opt27b_base` | Original OPT-2.7B | `facebook/opt-2.7b` | Disabled |

@@ -31,7 +31,7 @@ class ModelManager:
                 "adapter_path": (
                     self.project_root
                     / "models"
-                    / "opt-125m-news-simplifier"
+                    / "opt-125m-news-model"
                 )
             },
 

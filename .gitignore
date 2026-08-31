@@ -3,24 +3,24 @@
 models/*
 
 # Allow only the final LoRA adapter and tokenizer files required by the local
-# Flask application. Adapter weights are stored through Git LFS.
-!models/opt-125m-news-simplifier/
+# Flask application. Base weights, checkpoints, and training state stay ignored.
+!models/opt-125m-news-model/
 !models/opt-1.3b-news-model/
 !models/opt-2.7b-news-model/
 
-models/opt-125m-news-simplifier/*
+models/opt-125m-news-model/*
 models/opt-1.3b-news-model/*
 models/opt-2.7b-news-model/*
 
-!models/opt-125m-news-simplifier/adapter_config.json
-!models/opt-125m-news-simplifier/adapter_model.safetensors
-!models/opt-125m-news-simplifier/tokenizer_config.json
-!models/opt-125m-news-simplifier/special_tokens_map.json
-!models/opt-125m-news-simplifier/tokenizer.json
-!models/opt-125m-news-simplifier/added_tokens.json
-!models/opt-125m-news-simplifier/vocab.json
-!models/opt-125m-news-simplifier/merges.txt
-!models/opt-125m-news-simplifier/generation_config.json
+!models/opt-125m-news-model/adapter_config.json
+!models/opt-125m-news-model/adapter_model.safetensors
+!models/opt-125m-news-model/tokenizer_config.json
+!models/opt-125m-news-model/special_tokens_map.json
+!models/opt-125m-news-model/tokenizer.json
+!models/opt-125m-news-model/added_tokens.json
+!models/opt-125m-news-model/vocab.json
+!models/opt-125m-news-model/merges.txt
+!models/opt-125m-news-model/generation_config.json
 
 !models/opt-1.3b-news-model/adapter_config.json
 !models/opt-1.3b-news-model/adapter_model.safetensors
