@@ -6,6 +6,9 @@ peft
 bitsandbytes
 rouge-score
 textstat
+evaluate==0.4.6
+sacrebleu
+sacremoses
 torch
 torchvision
 torchaudio

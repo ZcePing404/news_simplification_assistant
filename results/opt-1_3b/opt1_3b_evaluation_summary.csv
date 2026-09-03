@@ -1,13 +1,48 @@
-metric,mean,std
-ROUGE-1,0.37363021187168294,0.12899584920605245
-ROUGE-2,0.1626877063956481,0.12416588985085239
-ROUGE-L,0.2658673574404544,0.10507124750976062
-SARI,40.37960879275583,6.394218886253212
-Full Target ROUGE-L,0.3970419678373284,0.09585556499967705
-Aspect Macro ROUGE-L,0.5199661828545343,0.20655169342568944
-Flesch Reading Ease,61.79790443021826,14.557485750475177
-Compression Ratio,0.13414583750315834,0.10713066664886753
-Generation Time (sec),8.53169313968021,1.8152695547532507
-Structured Output Completion Rate,0.98,0.1414213562373095
-Exact Label Completion Rate,0.9822222222222223,0.12570787221094176
-Test Article Truncation Rate,0.0,0.0
+category,metric,mean,std
+Summary,ROUGE-1,0.379460560633723,0.12294930136618949
+Summary,ROUGE-2,0.17097083429141158,0.11942569768495001
+Summary,ROUGE-L,0.2861595170850311,0.11378183179366995
+Summary,SARI,40.33953181546845,5.0132039139300355
+Summary,Flesch Reading Ease,59.65029069185487,14.070287148395611
+Summary,Compression Ratio,0.149122174781112,0.11967802256406844
+Aspects,Aspect Macro ROUGE-L,0.5799136253745124,0.16854537757226307
+Aspects,Event ROUGE-L,0.33803480428650645,0.24912554083639252
+Aspects,People/Organizations ROUGE-L,0.6709191919191919,0.3798431766529172
+Aspects,Date & Time ROUGE-L,0.85,0.35255998208135847
+Aspects,Location ROUGE-L,0.5971493506493506,0.3738105043876122
+Aspects,Causes ROUGE-L,0.30334127278001644,0.4307472508068367
+Aspects,Effects ROUGE-L,0.5779722633628649,0.48471793893349296
+Aspects,Countermeasures ROUGE-L,0.7219784946236558,0.4483037101712671
+Aspects,Date & Time Normalized Accuracy,0.84,0.3684529491774708
+Aspects,People/Organizations Entity Precision,0.6444444444444445,0.4386165972131146
+Aspects,People/Organizations Entity Recall,0.5855555555555556,0.4345502934679238
+Aspects,People/Organizations Entity F1,0.5844444444444444,0.411179600867781
+Aspects,Location Entity Precision,0.5208333333333334,0.4286862836907211
+Aspects,Location Entity Recall,0.5173611111111112,0.4261065173551723
+Aspects,Location Entity F1,0.5083333333333334,0.4125232582491456
+Aspects,Event Not stated Precision,0.0,
+Aspects,Event Not stated Recall,0.0,
+Aspects,Event Not stated F1,0.0,
+Aspects,People/Organizations Not stated Precision,0.7142857142857143,
+Aspects,People/Organizations Not stated Recall,0.5263157894736842,
+Aspects,People/Organizations Not stated F1,0.6060606060606061,
+Aspects,Date & Time Not stated Precision,0.9705882352941176,
+Aspects,Date & Time Not stated Recall,0.717391304347826,
+Aspects,Date & Time Not stated F1,0.825,
+Aspects,Location Not stated Precision,0.4444444444444444,
+Aspects,Location Not stated Recall,0.36363636363636365,
+Aspects,Location Not stated F1,0.39999999999999997,
+Aspects,Causes Not stated Precision,0.36619718309859156,
+Aspects,Causes Not stated Recall,0.7027027027027027,
+Aspects,Causes Not stated F1,0.4814814814814815,
+Aspects,Effects Not stated Precision,0.6086956521739131,
+Aspects,Effects Not stated Recall,0.9491525423728814,
+Aspects,Effects Not stated F1,0.7417218543046357,
+Aspects,Countermeasures Not stated Precision,0.75,
+Aspects,Countermeasures Not stated Recall,0.96,
+Aspects,Countermeasures Not stated F1,0.8421052631578947,
+Structure,Full Target ROUGE-L,0.40138982194511486,0.09770645046000129
+Structure,Structured Output Completion Rate,0.99,0.09999999999999999
+Structure,Exact Label Completion Rate,0.9977777777777778,0.022222222222222168
+Structure,Test Article Truncation Rate,0.0,0.0
+Efficiency,Generation Time (sec),8.750592446010014,2.6143595056335016

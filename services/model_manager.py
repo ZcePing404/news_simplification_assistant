@@ -14,12 +14,14 @@ from transformers import (
 class ModelManager:
     """
     Owns OPT model configuration, model switching, LoRA adapter loading,
-    and deterministic text generation.
+    and sampled text generation.
 
     Only one model is kept loaded at a time to reduce RAM/VRAM usage.
     """
 
     MAX_NEW_TOKENS = 384
+    GENERATION_TEMPERATURE = 0.7
+    GENERATION_TOP_P = 0.9
 
     def __init__(self, prompt_service):
         self.project_root = Path(__file__).resolve().parents[1]
@@ -132,8 +134,9 @@ class ModelManager:
         """
         Generate with the selected fine-tuned OPT model.
 
-        do_sample=False intentionally matches the deterministic generation
-        setup used by the evaluation notebook.
+        Sampling is enabled for the interactive application so that the model
+        can produce more varied simplifications. Formal notebook evaluation
+        remains deterministic for fair model comparison.
         """
 
         with self._generation_lock:
@@ -179,7 +182,9 @@ class ModelManager:
                     return model.generate(
                         **inputs,
                         max_new_tokens=self.MAX_NEW_TOKENS,
-                        do_sample=False,
+                        do_sample=True,
+                        temperature=self.GENERATION_TEMPERATURE,
+                        top_p=self.GENERATION_TOP_P,
                         pad_token_id=tokenizer.pad_token_id,
                         eos_token_id=tokenizer.eos_token_id
                     )

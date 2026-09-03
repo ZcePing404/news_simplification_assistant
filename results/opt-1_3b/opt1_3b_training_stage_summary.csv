@@ -1,0 +1,3 @@
+stage,final_logged_training_loss,best_validation_loss,best_quality_step,best_quality_score
+Stage 1 - CNN/DailyMail Summary,1.047,1.3639929294586182,1100,0.3559561147800432
+Stage 2 - Project Summary + 7 Aspects,0.6545,0.6920087337493896,425,0.5671085019003668
