@@ -1,0 +1,37 @@
+category,metric,mean,std
+Aspects,Aspect Macro ROUGE-L,0.5433651034391734,0.16033845305988884
+Aspects,Event ROUGE-L,0.303572908010857,0.22465144333494302
+Aspects,People/Organizations ROUGE-L,0.5500066045066044,0.3974955094286578
+Aspects,Date & Time ROUGE-L,0.9033333333333333,0.2931886695621028
+Aspects,Location ROUGE-L,0.46468614718614715,0.3260028675597788
+Aspects,Causes ROUGE-L,0.26077894877884444,0.3947855834180363
+Aspects,Effects ROUGE-L,0.595215771151255,0.4750788516158811
+Aspects,Countermeasures ROUGE-L,0.7259620111071723,0.4426258228691445
+Aspects,Date & Time Normalized Accuracy,0.9,0.30151134457776346
+Aspects,People/Organizations Entity Precision,0.4871794871794871,0.42834073291689595
+Aspects,People/Organizations Entity Recall,0.4967032967032967,0.4420785625128812
+Aspects,People/Organizations Entity F1,0.46834118262689683,0.4046525676330248
+Aspects,Location Entity Precision,0.41237113402061853,0.381951603598426
+Aspects,Location Entity Recall,0.422680412371134,0.3909137678352622
+Aspects,Location Entity F1,0.4072164948453608,0.3679657166285669
+Aspects,Event Not stated Precision,0.0,
+Aspects,Event Not stated Recall,0.0,
+Aspects,Event Not stated F1,0.0,
+Aspects,People/Organizations Not stated Precision,0.4444444444444444,
+Aspects,People/Organizations Not stated Recall,0.42105263157894735,
+Aspects,People/Organizations Not stated F1,0.43243243243243246,
+Aspects,Date & Time Not stated Precision,0.975,
+Aspects,Date & Time Not stated Recall,0.8478260869565217,
+Aspects,Date & Time Not stated F1,0.9069767441860466,
+Aspects,Location Not stated Precision,0.6,
+Aspects,Location Not stated Recall,0.2727272727272727,
+Aspects,Location Not stated F1,0.37499999999999994,
+Aspects,Causes Not stated Precision,0.35185185185185186,
+Aspects,Causes Not stated Recall,0.5135135135135135,
+Aspects,Causes Not stated F1,0.4175824175824176,
+Aspects,Effects Not stated Precision,0.6627906976744186,
+Aspects,Effects Not stated Recall,0.9661016949152542,
+Aspects,Effects Not stated F1,0.786206896551724,
+Aspects,Countermeasures Not stated Precision,0.782608695652174,
+Aspects,Countermeasures Not stated Recall,0.96,
+Aspects,Countermeasures Not stated F1,0.8622754491017965,

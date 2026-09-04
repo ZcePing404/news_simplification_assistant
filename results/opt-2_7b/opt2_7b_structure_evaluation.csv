@@ -1,0 +1,5 @@
+category,metric,mean,std
+Structure,Full Target ROUGE-L,0.38619283380464586,0.08337617390173256
+Structure,Structured Output Completion Rate,0.99,0.09999999999999999
+Structure,Exact Label Completion Rate,0.9911111111111112,0.0888888888888888
+Structure,Test Article Truncation Rate,0.0,0.0
