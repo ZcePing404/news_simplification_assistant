@@ -1,15 +1,11 @@
 import logging
 
 from flask import Flask, jsonify, render_template, request
-from dotenv import load_dotenv
 
 from services.model_manager import ModelManager
 from services.output_parser import OutputParser
 from services.preprocessor import NewsPreprocessor
 from services.prompt_service import PromptService
-
-
-load_dotenv()
 
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
