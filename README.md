@@ -1,9 +1,5 @@
 # News Simplification Assistant
 
-This project fine-tunes OPT-125M, OPT-1.3B, and OPT-2.7B to simplify news
-articles and generate seven structured aspects. The Flask application performs
-inference locally and loads one selected OPT model at a time.
-
 ## Application workflow
 
 1. The user enters a news article and selects a model.
@@ -24,10 +20,6 @@ inference locally and loads one selected OPT model at a time.
 | `opt13b_news` | Fine-tuned OPT-1.3B | `facebook/opt-1.3b` | `models/opt-1.3b-news-model` |
 | `opt27b_base` | Original OPT-2.7B | `facebook/opt-2.7b` | Disabled |
 | `opt27b_news` | Fine-tuned OPT-2.7B | `facebook/opt-2.7b` | `models/opt-2.7b-news-model` |
-
-The application downloads the original OPT weights from Hugging Face when they
-are not already cached. Each fine-tuned option combines the corresponding base
-model with its local LoRA adapter.
 
 ## Local setup
 
@@ -50,13 +42,3 @@ flask --app app run
 ```
 
 Open `http://127.0.0.1:5000` in a browser.
-
-## Active deployment files
-
-- `app.py`: Flask routes and response handling
-- `services/model_manager.py`: model loading, switching, and generation
-- `services/prompt_service.py`: prompt construction and TF-IDF guidance
-- `services/preprocessor.py`: article cleaning and length checks
-- `services/output_parser.py`: summary and aspect parsing
-- `templates/index.html`: web interface
-- `static/style.css`: interface styling
